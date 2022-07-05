@@ -10,6 +10,25 @@ receivers:
           - source_labels: [ __name__ ]
             regex: '.*grpc_io.*'
             action: drop
+  prometheus/services:
+    config:
+      scrape_configs:
+      - job_name: api-gateway
+        metrics_path: /actuator/prometheus
+        static_configs:
+        - targets: ['api-gateway:8080']
+      - job_name: customers-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+        - targets: ['customers-service:8081']
+      - job_name: visits-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+        - targets: ['visits-service:8082']
+      - job_name: vets-service
+        metrics_path: /actuator/prometheus
+        static_configs:
+        - targets: ['vets-service:8083']
   zipkin:
     endpoint: 0.0.0.0:9411
 
@@ -40,6 +59,6 @@ service:
       processors: [memory_limiter, batch, resource/environment]
       exporters: [sapm, signalfx]
     metrics/internal:
-      receivers: [prometheus/internal]
+      receivers: [prometheus/services, prometheus/internal]
       processors: [memory_limiter, batch, resource/environment]
       exporters: [signalfx]

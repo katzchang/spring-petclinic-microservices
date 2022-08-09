@@ -63,11 +63,14 @@ services:
      - 8080:8080
 
   tracing-server:
-    image: openzipkin/zipkin
+    image: quay.io/signalfx/splunk-otel-collector
     container_name: tracing-server
     mem_limit: 512M
-    environment:
-    - JAVA_OPTS=-XX:+UnlockExperimentalVMOptions -Djava.security.egd=file:/dev/./urandom
+    volumes:
+     - ./otel:/otel
+    command: --config /otel/collector.yaml
+    env_file:
+     - ./otel/.env
     ports:
      - 9411:9411
 
@@ -82,18 +85,3 @@ services:
     ports:
      - 9090:9090
 
-  ## Grafana / Prometheus
-
-  grafana-server:
-    build: ./docker/grafana
-    container_name: grafana-server
-    mem_limit: 256M
-    ports:
-    - 3000:3000
-
-  prometheus-server:
-    build: ./docker/prometheus
-    container_name: prometheus-server
-    mem_limit: 256M
-    ports:
-    - 9091:9090
